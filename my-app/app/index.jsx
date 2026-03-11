@@ -11,6 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [topic, setTopic] = useState("");
+  const [numQuestions, setNumQuestions] = useState("5");
+  const [difficulty, setDifficulty] = useState("medium");
 
   const router = useRouter();
 
@@ -20,7 +22,19 @@ export default function Index() {
       return;
     }
 
-    router.push(`/quiz?topic=${encodeURIComponent(topic)}`);
+    if (isNaN(numQuestions) || parseInt(numQuestions) <= 0) {
+      alert("Please enter a valid number of questions.");
+      return;
+    }
+
+    if (!["easy", "medium", "hard"].includes(difficulty.toLowerCase().trim())) {
+      alert("Please enter a valid difficulty (easy, medium, hard).");
+      return;
+    }
+
+    router.push(
+      `/quiz?topic=${encodeURIComponent(topic)}&numQuestions=${encodeURIComponent(numQuestions)}&difficulty=${encodeURIComponent(difficulty)}`,
+    );
   };
 
   return (
@@ -33,6 +47,21 @@ export default function Index() {
           style={styles.input}
           value={topic}
           onChangeText={setTopic}
+        />
+        <TextInput
+          placeholder="Number of questions (default 5)"
+          placeholderTextColor="#888"
+          style={styles.input}
+          keyboardType="numeric"
+          value={numQuestions}
+          onChangeText={setNumQuestions}
+        />
+        <TextInput
+          placeholder="Difficulty (easy, medium, hard)"
+          placeholderTextColor="#888"
+          style={styles.input}
+          value={difficulty}
+          onChangeText={setDifficulty}
         />
         <TouchableOpacity style={styles.button} onPress={handleGenerateQuiz}>
           <Text style={styles.buttonText}>Generate Quiz</Text>

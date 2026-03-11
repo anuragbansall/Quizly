@@ -36,9 +36,13 @@ const Quiz = () => {
 
   const router = useRouter();
 
-  const { topic } = useLocalSearchParams();
+  const { topic, numQuestions, difficulty } = useLocalSearchParams();
 
-  const { quizes, loading, error } = useQuestions(topic, "easy", 3);
+  const { quizes, loading, error } = useQuestions(
+    topic,
+    difficulty,
+    parseInt(numQuestions),
+  );
 
   if (loading) {
     return (

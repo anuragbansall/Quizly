@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 function useQuestions(topic, difficulty, numQuestions) {
@@ -6,10 +6,18 @@ function useQuestions(topic, difficulty, numQuestions) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  console.log("useQuestions called with:", { topic, difficulty, numQuestions });
+
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
       setError(null);
+
+      const parsedNumQuestions = Number.parseInt(numQuestions, 10);
+      const safeNumQuestions =
+        Number.isNaN(parsedNumQuestions) || parsedNumQuestions <= 0
+          ? 5
+          : parsedNumQuestions;
 
       if (!topic) {
         setError("Topic is required to fetch questions.");
@@ -24,7 +32,7 @@ function useQuestions(topic, difficulty, numQuestions) {
           {
             topic: topic,
             difficulty: difficulty,
-            totalQuestions: numQuestions,
+            numQuestions: safeNumQuestions,
           },
           {
             headers: {
