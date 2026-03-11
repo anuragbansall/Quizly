@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "ai-worker",
+	"name": "quizly-ai-worker",
 	"main": "src/index.js",
 	"compatibility_date": "2026-03-01",
 	"observability": {

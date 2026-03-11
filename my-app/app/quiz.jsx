@@ -1,30 +1,31 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import useQuestions from "../hooks/useQuestions";
 
-const quizes = {
-  topic: "The Solar System",
-  difficulty: "easy",
-  totalQuestions: 3,
-  questions: [
-    {
-      question: "What is the largest planet in our solar system?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-      answer: "Jupiter",
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Venus", "Mars", "Mercury", "Neptune"],
-      answer: "Mars",
-    },
-    {
-      question: "What is the name of the fifth planet from the Sun?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-      answer: "Jupiter",
-    },
-  ],
-};
+// const quizes = {
+//   topic: "The Solar System",
+//   difficulty: "easy",
+//   totalQuestions: 3,
+//   questions: [
+//     {
+//       question: "What is the largest planet in our solar system?",
+//       options: ["Earth", "Mars", "Jupiter", "Saturn"],
+//       answer: "Jupiter",
+//     },
+//     {
+//       question: "Which planet is known as the Red Planet?",
+//       options: ["Venus", "Mars", "Mercury", "Neptune"],
+//       answer: "Mars",
+//     },
+//     {
+//       question: "What is the name of the fifth planet from the Sun?",
+//       options: ["Earth", "Mars", "Jupiter", "Saturn"],
+//       answer: "Jupiter",
+//     },
+//   ],
+// };
 
 const Quiz = () => {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -32,6 +33,38 @@ const Quiz = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isQuizEnded, setIsQuizEnded] = useState(false);
   const [score, setScore] = useState(0);
+
+  const router = useRouter();
+
+  const { topic } = useLocalSearchParams();
+
+  const { quizes, loading, error } = useQuestions(topic, "easy", 3);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Loading Quiz...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>
+          Failed to fetch quiz data. Please try again.
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (quizes.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>No Questions Available</Text>
+      </SafeAreaView>
+    );
+  }
 
   const isCorrectAnswer = (option) => {
     return option === quizes.questions[currentQuestionIndex].answer;
@@ -89,7 +122,12 @@ const Quiz = () => {
         <View style={styles.inner}>
           <View style={styles.quizHeader}>
             <Text style={styles.title}>{quizes.topic} Quiz</Text>
-            <Text style={styles.capsule}>{quizes.difficulty}</Text>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Text style={styles.capsule}>{quizes.difficulty}</Text>
+              <Text style={styles.capsule}>
+                {currentQuestionIndex + 1}/{quizes.questions.length}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.questionContainer}>
